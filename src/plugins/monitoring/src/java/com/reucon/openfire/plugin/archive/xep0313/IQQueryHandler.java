@@ -3,6 +3,7 @@ package com.reucon.openfire.plugin.archive.xep0313;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -81,7 +82,30 @@ public class IQQueryHandler extends AbstractIQHandler implements
 		final QueryRequest queryRequest = new QueryRequest(packet.getChildElement(), archiveJid);
 		Collection<ArchivedMessage> archivedMessages = retrieveMessages(queryRequest);
 
-		for(ArchivedMessage archivedMessage : archivedMessages) {
+		DataForm dataForm = queryRequest.getDataForm();
+		boolean asc = true;
+		if(dataForm != null) {
+			if(dataForm.getField("order") != null) {
+				String order = dataForm.getField("order").getFirstValue();
+				if (order != null && order.toLowerCase().equals("desc")) {
+					asc = false;
+				}
+			}
+		}
+
+		Collection<ArchivedMessage> orderedMessages;
+		if(asc) {
+			orderedMessages = archivedMessages;
+		} else {
+			ArrayList<ArchivedMessage> messagesList = new ArrayList<ArchivedMessage>(archivedMessages.size());
+			int i = archivedMessages.size();
+			for(ArchivedMessage archivedMessage : archivedMessages) {
+				messagesList.set(--i, archivedMessage);
+			}
+			orderedMessages = messagesList;
+		}
+
+		for(ArchivedMessage archivedMessage : orderedMessages) {
 			sendMessageResult(session, queryRequest, archivedMessage);
 		}
 
@@ -253,6 +277,7 @@ public class IQQueryHandler extends AbstractIQHandler implements
 		form.addField("with", null, FormField.Type.jid_single);
 		form.addField("start", null, FormField.Type.text_single);
 		form.addField("end", null, FormField.Type.text_single);
+		form.addField("order", null, FormField.Type.text_single);
 
 		query.add(form.getElement());
 
