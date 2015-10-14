@@ -3,11 +3,11 @@ package com.reucon.openfire.plugin.archive.xep0313;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.TimeZone;
 
 import org.dom4j.Document;
@@ -97,10 +97,9 @@ public class IQQueryHandler extends AbstractIQHandler implements
 		if(asc) {
 			orderedMessages = archivedMessages;
 		} else {
-			ArrayList<ArchivedMessage> messagesList = new ArrayList<ArchivedMessage>(archivedMessages.size());
-			int i = archivedMessages.size();
+			LinkedList<ArchivedMessage> messagesList = new LinkedList<ArchivedMessage>();
 			for(ArchivedMessage archivedMessage : archivedMessages) {
-				messagesList.set(--i, archivedMessage);
+				messagesList.addFirst(archivedMessage);
 			}
 			orderedMessages = messagesList;
 		}
