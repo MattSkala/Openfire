@@ -987,11 +987,9 @@ public class ConversationManager implements Startable, ComponentEventListener{
 					pstmt = con.prepareStatement(INSERT_MESSAGE);
 					ArchivedMessage message;
 					
-					int msgCount = getArchivedMessageCount();
-					
 					int count = 0;
 					while ((message = messageQueue.poll()) != null) {
-						pstmt.setInt(1, ++msgCount);
+						pstmt.setInt(1, 0);
 						pstmt.setLong(2, message.getConversationID());
 						pstmt.setString(3, message.getFromJID().toBareJID());
 						pstmt.setString(4, message.getFromJID().getResource());
