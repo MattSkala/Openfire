@@ -20,6 +20,7 @@ public class Xep0313Support extends AbstractXepSupport {
 
 		this.iqHandlers = new ArrayList<IQHandler>();
 		iqHandlers.add(new IQQueryHandler());
+		iqHandlers.add(new IQRemoveConversationHandler());
 	}
 
 }
