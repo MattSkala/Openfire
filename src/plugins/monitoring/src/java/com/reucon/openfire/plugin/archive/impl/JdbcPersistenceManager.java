@@ -104,6 +104,10 @@ public class JdbcPersistenceManager implements PersistenceManager {
 
 	public static final String MESSAGE_FROM_JID = "ofMessageArchive.fromJID";
 
+	public static final String MESSAGE_REMOVED_FROM = "ofMessageArchive.removedFrom";
+
+	public static final String MESSAGE_REMOVED_TO = "ofMessageArchive.removedTo";
+
 	public static final String SELECT_ACTIVE_CONVERSATIONS = "SELECT DISTINCT " + "ofConversation.conversationID, " + "ofConversation.room, "
 			+ "ofConversation.isExternal, " + "ofConversation.startDate, " + "ofConversation.lastActivity, " + "ofConversation.messageCount, "
 			+ "ofConParticipant.joinedDate, " + "ofConParticipant.leftDate, " + "ofConParticipant.bareJID, " + "ofConParticipant.jidResource, "
@@ -398,6 +402,7 @@ public class JdbcPersistenceManager implements PersistenceManager {
 		}
 		if (ownerJid != null) {
 			appendWhere(whereSB, CONVERSATION_OWNER_JID, " = ?");
+			appendWhere(whereSB, "((", MESSAGE_TO_JID, " = ? AND ", MESSAGE_REMOVED_TO, " = 0) OR (", MESSAGE_FROM_JID, " = ? AND ", MESSAGE_REMOVED_FROM, " = 0))");
 		}
 		if(withJid != null) {
 			appendWhere(whereSB, "( ", MESSAGE_TO_JID, " = ? OR ", MESSAGE_FROM_JID, " = ? )");
@@ -571,6 +576,8 @@ public class JdbcPersistenceManager implements PersistenceManager {
 			pstmt.setLong(parameterIndex++, dateToMillis(endDate));
 		}
 		if (ownerJid != null) {
+			pstmt.setString(parameterIndex++, ownerJid);
+			pstmt.setString(parameterIndex++, ownerJid);
 			pstmt.setString(parameterIndex++, ownerJid);
 		}
 		if (withJid != null) {
