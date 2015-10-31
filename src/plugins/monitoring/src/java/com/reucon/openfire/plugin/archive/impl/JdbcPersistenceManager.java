@@ -15,7 +15,8 @@ import org.jivesoftware.database.DbConnectionManager;
 import org.jivesoftware.openfire.archive.ConversationManager;
 import org.jivesoftware.util.JiveConstants;
 import org.jivesoftware.util.JiveGlobals;
-import org.jivesoftware.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
 
 import com.reucon.openfire.plugin.archive.ArchivedMessageConsumer;
@@ -31,6 +32,8 @@ import com.reucon.openfire.plugin.archive.xep0059.XmppResultSet;
  */
 public class JdbcPersistenceManager implements PersistenceManager {
 	public static final int DEFAULT_MAX = 1000;
+
+	private static final Logger Log = LoggerFactory.getLogger(JdbcPersistenceManager.class);
 
 	public static final String SELECT_MESSAGES_BY_CONVERSATION = "SELECT DISTINCT " + "ofConversation.conversationID, " + "ofConversation.room, "
 			+ "ofConversation.isExternal, " + "ofConversation.startDate, " + "ofConversation.lastActivity, " + "ofConversation.messageCount, "

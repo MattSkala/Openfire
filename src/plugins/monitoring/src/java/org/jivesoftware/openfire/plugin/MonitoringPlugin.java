@@ -38,6 +38,7 @@ import org.jivesoftware.openfire.reporting.stats.StatisticsModule;
 import org.jivesoftware.openfire.reporting.stats.StatsEngine;
 import org.jivesoftware.openfire.reporting.stats.StatsViewer;
 import org.jivesoftware.openfire.reporting.util.TaskEngine;
+import org.jivesoftware.openfire.kewe.IQRemoveHandler;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.JiveProperties;
 import org.picocontainer.MutablePicoContainer;
@@ -161,6 +162,8 @@ public class MonitoringPlugin implements Plugin {
 
 		xep0313Support = new Xep0313Support(XMPPServer.getInstance());
 		xep0313Support.start();
+
+		XMPPServer.getInstance().getIQRouter().addHandler(new IQRemoveHandler());
 
 		System.out.println("Starting Monitoring Plugin");
 

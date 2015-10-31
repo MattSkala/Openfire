@@ -1,8 +1,10 @@
-package com.reucon.openfire.plugin.archive.xep0313;
+package org.jivesoftware.openfire.kewe;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Iterator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,23 +16,24 @@ import org.dom4j.Element;
 import org.jivesoftware.openfire.auth.UnauthorizedException;
 import org.jivesoftware.openfire.handler.IQHandler;
 import org.jivesoftware.openfire.session.LocalClientSession;
+import org.jivesoftware.openfire.disco.ServerFeaturesProvider;
 import org.jivesoftware.database.DbConnectionManager;
 import com.reucon.openfire.plugin.archive.xep.AbstractIQHandler;
 
 /**
  * IQ Handler for removing conversations from archive.
  */
-public class IQRemoveConversationHandler extends AbstractIQHandler {
+public class IQRemoveHandler extends AbstractIQHandler implements ServerFeaturesProvider {
 
   private static final Logger Log = LoggerFactory.getLogger(IQHandler.class);
   private static final String NAMESPACE = "kewe:archive";
-  private static final String MODULE_NAME = "Archive Remove Conversation Query Handler";
+  private static final String MODULE_NAME = "Archive Remove Query Handler";
 
   private static final String REMOVE_MESSAGES_FROM = "UPDATE ofMessageArchive SET removedFrom = 1 WHERE fromJID = ? AND toJID = ?";
   private static final String REMOVE_MESSAGES_TO = "UPDATE ofMessageArchive SET removedTo = 1 WHERE fromJID = ? AND toJID = ?";
 
-  protected IQRemoveConversationHandler() {
-    super(MODULE_NAME, "remove-conversation", NAMESPACE);
+  public IQRemoveHandler() {
+    super(MODULE_NAME, "remove", NAMESPACE);
   }
 
   @Override
@@ -64,12 +67,12 @@ public class IQRemoveConversationHandler extends AbstractIQHandler {
     try {
       con = DbConnectionManager.getConnection();
       pstmt1 = con.prepareStatement(REMOVE_MESSAGES_FROM);
-      pstmt1.setString(0, fromJid);
-      pstmt1.setString(1, participantJid);
+      pstmt1.setString(1, fromJid);
+      pstmt1.setString(2, participantJid);
       pstmt1.execute();
       pstmt2 = con.prepareStatement(REMOVE_MESSAGES_TO);
-      pstmt2.setString(0, participantJid);
-      pstmt2.setString(1, fromJid);
+      pstmt2.setString(1, participantJid);
+      pstmt2.setString(2, fromJid);
       pstmt2.execute();
     } catch (SQLException sqle) {
       Log.error("Error removing conversation", sqle);
@@ -99,5 +102,10 @@ public class IQRemoveConversationHandler extends AbstractIQHandler {
     reply.setChildElement(packet.getChildElement().createCopy());
     reply.setError(PacketError.Condition.internal_server_error);
     return reply;
+  }
+
+  @Override
+  public Iterator<String> getFeatures() {
+    return Collections.singleton(NAMESPACE).iterator();
   }
 }
